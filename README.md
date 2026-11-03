@@ -6,7 +6,7 @@ Aplicativo pessoal em **Next.js App Router, TypeScript, Tailwind CSS, Recharts e
 
 - Supabase: projeto `planejamento-financeiro`, região São Paulo (`sa-east-1`), organização CoinReys.
 - Banco criado e migrations executadas; RLS por usuário e privilégios mínimos verificados. Nenhuma movimentação pessoal é pública.
-- GitHub: envio pendente de envio ao repositório `FernandoReys/planejamento-financeiro`.
+- GitHub: código publicado em https://github.com/FernandoReys/planejamento-financeiro.
 - Vercel: criação do projeto recusada pela conexão atual (403, sem permissão para criar projetos). Não há deploy Vercel concluído.
 - A versão anterior hospedada no Sites é independente deste checkout Next.js.
 
