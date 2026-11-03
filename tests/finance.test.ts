@@ -1,0 +1,13 @@
+import {strict as a} from 'node:assert';
+import {initial} from './fixture.ts';
+import {monthly,dateFor,events,project,pay} from '../lib/finance.ts';
+a.equal(monthly(initial).income,250000);a.equal(monthly(initial).expense,105000);a.equal(monthly(initial).surplus,145000);
+a.equal(events(initial,'2026-11-03','2026-11-30').filter(x=>x.entry.id==='car').length,0);
+a.equal(dateFor({...initial.entries[0],day:30,advance:false},'2027-02'),'2027-02-28');
+a.equal(dateFor(initial.entries[0],'2026-11'),'2026-11-13');
+a.equal(dateFor({...initial.entries[0],day:20},'2026-11'),'2026-11-19');
+a.equal(dateFor(initial.entries[1],'2026-11'),'2026-11-20');
+a.equal(pay(pay(initial,'brother','2026-11'),'brother','2026-11').brother,450000);
+a.equal(project({...initial,balance:0,entries:[{...initial.entries[3],paid:[]}]},'2026-11-15').find(x=>x.balance<0)?.date,'2026-11-13');
+a.equal(project(initial,'2026-11-30').at(-1)?.balance,205000);
+a.equal(initial.brother,500000);console.log('9 verificações financeiras aprovadas');

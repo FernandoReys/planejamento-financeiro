@@ -1,0 +1,5 @@
+'use server';
+import {redirect} from 'next/navigation';
+import {createClient} from '../../lib/supabase/server';
+export async function login(form:FormData){const email=String(form.get('email')||'').trim().toLowerCase(),password=String(form.get('password')||'');if(!process.env.OWNER_EMAIL||email!==process.env.OWNER_EMAIL.toLowerCase())redirect('/login?message=invalid');const client=await createClient();const {error}=await client.auth.signInWithPassword({email,password});if(error)redirect('/login?message=invalid');redirect('/');}
+export async function signup(form:FormData){const email=String(form.get('email')||'').trim().toLowerCase(),password=String(form.get('password')||'');if(!process.env.OWNER_EMAIL||email!==process.env.OWNER_EMAIL.toLowerCase()||password.length<12)redirect('/login?message=signup');const client=await createClient();const {error}=await client.auth.signUp({email,password,options:{emailRedirectTo:process.env.NEXT_PUBLIC_SITE_URL?process.env.NEXT_PUBLIC_SITE_URL+'/auth/confirm':undefined}});if(error)redirect('/login?message=signup');redirect('/login?message=confirm');}
