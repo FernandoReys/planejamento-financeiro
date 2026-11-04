@@ -8,3 +8,15 @@ const first=recordPayment(partial,{...p,id:'p2'});assert.equal(debtSummary(first
 assert.throws(()=>recordPayment(d,{...p,amount:30001}));assert.equal(validDate('2027-02-30'),false);
 assert.equal(calculateCents('0,1 + 0,2'),30);assert.equal(calculateCents('2 + 3 * 4'),1400);assert.equal(calculateCents('(2 + 3) × 4'),2000);assert.equal(calculateCents('500 - 500 * 10%'),45000);assert.equal(calculateCents('-0.005'),-1);assert.throws(()=>calculateCents('10/0'));assert.throws(()=>calculateCents('alert(1)'));
 console.log('Debt calculations and payment tests passed');
+
+// The history contains completed installments; a partial payment stays open.
+const {installmentLedger}=await import('../lib/debts.ts');
+assert.deepEqual(installmentLedger(partial).map(r=>[r.paid,r.remaining,r.status]),[[5000,5000,'partial'],[0,10000,'open'],[0,10000,'open']]);
+assert.equal(installmentLedger(first).filter(r=>r.status==='paid').length,1);
+assert.equal(installmentLedger(first)[0].completedAt,'2027-01-15');
+assert.equal(installmentLedger(done).filter(r=>r.status==='paid').length,3);
+const undo={...first,payments:first.payments.filter(p=>p.id!=='p2')};assert.equal(installmentLedger(undo).filter(r=>r.status==='paid').length,0);
+const advance=recordPayment(d,{...p,amount:25000});assert.deepEqual(installmentLedger(advance).map(r=>r.status),['paid','paid','partial']);assert.equal(installmentLedger(advance).reduce((a,r)=>a+r.remaining,0),debtSummary(advance).remaining);
+const prior={...d,initialPaid:10000};assert.equal(installmentLedger(prior)[0].status,'paid');assert.equal(installmentLedger(prior)[0].completedAt,null);
+const small={...d,total:10000,installments:3};const full=recordPayment(small,{...p,amount:10000});assert.equal(installmentLedger(full).reduce((a,r)=>a+r.paid,0),10000);
+console.log('Installment history: partial, advance, undo and initial payments passed');

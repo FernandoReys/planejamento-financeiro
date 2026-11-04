@@ -4,13 +4,13 @@ Aplicativo pessoal simples para guardar dívidas e calcular valores. Next.js, Ty
 
 ## Uso
 
-- **Dívidas:** cadastre nome, total, quantidade de parcelas e primeiro vencimento opcional. Registre pagamentos parciais ou integrais e acompanhe o saldo restante. Dívidas quitadas ficam na aba Pagas.
-- **Calculadora:** operações básicas, porcentagens e divisão exata em parcelas, com opção de transformar o resultado em dívida.
+- **Dívidas:** cadastre nome, total, quantidade de parcelas e primeiro vencimento opcional. Registre pagamentos parciais ou integrais e acompanhe o saldo restante. Parcelas quitadas vão automaticamente para **Contas pagas**, agrupadas pelo mês em que o pagamento completou a parcela. Dívidas totalmente quitadas ficam em **Quitadas**. Pagamentos parciais permanecem em aberto pelo saldo restante. O histórico pode ser filtrado por mês; desfazer um pagamento recalcula as parcelas e o saldo.
+- **Calculadora:** simulação mensal de quitação a partir do saldo atual das dívidas ou de um valor digitado. Informe o pagamento mensal para descobrir o prazo, ou informe o prazo para calcular o menor pagamento em centavos que quita nesse período. Juros mensais opcionais e extras recorrentes são considerados, com comparação do prazo sem o extra. O cronograma mostra pagamento, juros e saldo mês a mês. Operações básicas e divisão simples de parcelas continuam em Outras contas.
 - Cada cadastro, edição e pagamento é salvo automaticamente ao confirmar. Falhas são informadas e não aparecem como gravações concluídas. É necessário estar conectado para salvar.
 - Conta permite baixar backup JSON, desfazer pagamentos nos detalhes e sair.
 - O login mantém o botão de mostrar senha e a opção de manter a sessão.
 
-Os valores usam centavos inteiros. Parcelas recebem o ajuste de centavos nas primeiras posições para fechar o total. Pagamentos são alocados da primeira parcela em aberto em diante. As datas mensais respeitam o dia original, limitando ao último dia de meses curtos. Não há juros ou multas automáticos.
+Os valores usam centavos inteiros. Parcelas recebem o ajuste de centavos nas primeiras posições para fechar o total. Pagamentos são alocados da primeira parcela em aberto em diante. As datas mensais respeitam o dia original, limitando ao último dia de meses curtos. Não há juros ou multas automáticos nos registros das dívidas. A simulação opcional aplica juros ao saldo antes de cada pagamento, incluindo o primeiro, com arredondamento mensal para centavos. Taxas e multas não estão incluídas. A simulação não altera o saldo real nem cria pagamentos; estes devem ser registrados em Dívidas.
 
 O documento financeiro anterior permanece no banco e no backup; a interface agora mostra somente as dívidas cadastradas neste formato. Nenhuma limpeza de dados acompanha esta atualização.
 

@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types tests/finance.test.ts && node --experimental-strip-types tests/empty-state.test.ts && node --experimental-strip-types tests/debts.test.ts"
+    "test": "node --experimental-strip-types tests/finance.test.ts && node --experimental-strip-types tests/empty-state.test.ts && node --experimental-strip-types tests/debts.test.ts && node --experimental-strip-types tests/payoff.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
