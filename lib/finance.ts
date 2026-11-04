@@ -1,5 +1,6 @@
+import type {Debt} from './debts';
 export type Entry={id:string;name:string;amount:number;kind:'income'|'expense';day:number|null;category:string;paid:string[];start?:string;end?:string;maximum?:number;advance?:boolean};
-export type State={details?:{employer?:string;role?:string;grossSalary?:number;admission?:string;carModel?:string;carYear?:number;installments?:number;carPayment?:number;plr?:number;thirteenthAvos?:number};balance:number;reference:string;entries:Entry[];brother:number;carIncludesNovember:'unknown'|'yes'|'no';goals:{id:string;name:string;target:number;saved:number}[];holidays:string[]};
+export type State={debts?:Debt[];details?:{employer?:string;role?:string;grossSalary?:number;admission?:string;carModel?:string;carYear?:number;installments?:number;carPayment?:number;plr?:number;thirteenthAvos?:number};balance:number;reference:string;entries:Entry[];brother:number;carIncludesNovember:'unknown'|'yes'|'no';goals:{id:string;name:string;target:number;saved:number}[];holidays:string[]};
 export const money=(c:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(c/100);
 export const iso=(d:Date)=>d.toISOString().slice(0,10);
 export const parse=(s:string)=>new Date(s+'T12:00:00Z');
@@ -9,3 +10,4 @@ export function events(s:State,from:string,to:string,scenario='conservative'){co
 export function project(s:State,to:string,scenario='conservative'){const ev=events(s,s.reference,to,scenario);let balance=s.balance;const points=[];for(let d=parse(s.reference);iso(d)<=to;d.setUTCDate(d.getUTCDate()+1)){const date=iso(d),items=ev.filter(e=>e.date===date);balance+=items.reduce((sum,e)=>sum+(e.entry.kind==='income'?e.amount:-e.amount),0);points.push({date,balance,items});}return points;}
 export function monthly(s:State){const income=s.entries.filter(e=>e.kind==='income').reduce((a,e)=>a+e.amount,0),expense=s.entries.filter(e=>e.kind==='expense').reduce((a,e)=>a+e.amount,0);return {income,expense,surplus:income-expense};}
 export function pay(s:State,id:string,month:string):State{const e=s.entries.find(x=>x.id===id);if(!e||e.paid.includes(month))return s;return {...s,balance:s.balance+(e.kind==='income'?e.amount:-e.amount),brother:id==='brother'?Math.max(0,s.brother-e.amount):s.brother,entries:s.entries.map(x=>x.id===id?{...x,paid:[...x.paid,month]}:x)};}
+

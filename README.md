@@ -1,113 +1,58 @@
-# Planejamento Financeiro
+# Minhas dívidas
 
-Aplicativo pessoal em **Next.js App Router, TypeScript, Tailwind CSS, Recharts e Supabase**. A interface mantém o tema escuro, cards verdes e roxos no desktop e saldo amarelo com navegação flutuante no celular.
+Aplicativo pessoal simples para guardar dívidas e calcular valores. Next.js, TypeScript e Supabase.
 
-## Situação da publicação
+## Uso
 
-- Supabase: projeto `planejamento-financeiro`, região São Paulo (`sa-east-1`), organização CoinReys.
-- Banco criado e migrations executadas; RLS por usuário e privilégios mínimos verificados. Nenhuma movimentação pessoal é pública.
-- GitHub: código publicado em https://github.com/FernandoReys/planejamento-financeiro.
-- Vercel: https://planejamento-financeiro-eight-olive.vercel.app (produção).
-- A versão anterior hospedada no Sites é independente deste checkout Next.js.
+- **Dívidas:** cadastre nome, total, quantidade de parcelas e primeiro vencimento opcional. Registre pagamentos parciais ou integrais e acompanhe o saldo restante. Dívidas quitadas ficam na aba Pagas.
+- **Calculadora:** operações básicas, porcentagens e divisão exata em parcelas, com opção de transformar o resultado em dívida.
+- Cada cadastro, edição e pagamento é salvo automaticamente ao confirmar. Falhas são informadas e não aparecem como gravações concluídas. É necessário estar conectado para salvar.
+- Conta permite baixar backup JSON, desfazer pagamentos nos detalhes e sair.
+- O login mantém o botão de mostrar senha e a opção de manter a sessão.
 
-## Executar no Windows / VS Code
+Os valores usam centavos inteiros. Parcelas recebem o ajuste de centavos nas primeiras posições para fechar o total. Pagamentos são alocados da primeira parcela em aberto em diante. As datas mensais respeitam o dia original, limitando ao último dia de meses curtos. Não há juros ou multas automáticos.
 
-Extraia o ZIP. Abra a pasta que contém `package.json` no VS Code. Node.js 22.13+.
+O documento financeiro anterior permanece no banco e no backup; a interface agora mostra somente as dívidas cadastradas neste formato. Nenhuma limpeza de dados acompanha esta atualização.
 
-```powershell
+## Executar
+
+Node.js 22.13+:
+
+```sh
 npm ci
-Copy-Item .env.example .env.local
-```
-
-Preencha `.env.local` com a URL, chave **publishable**, e-mail proprietário e URL do site. Nenhuma chave `service_role` é necessária. Então:
-
-```powershell
+cp .env.example .env.local
 npm run dev
 ```
 
-Acesse http://localhost:3000. Para produção local, `npm run build` e `npm start`.
+Configure no arquivo local e na Vercel:
 
-## Supabase
-
-Projeto criado: `iqgjckyjzlrbmotscpod`.
-
-https://supabase.com/dashboard/project/iqgjckyjzlrbmotscpod
-
-As migrations em `supabase/migrations/` já foram aplicadas neste projeto. Não execute novamente as instruções CREATE TABLE no mesmo banco. Elas servem para reproduzir o esquema em um projeto novo.
-
-A tabela `financial_state` guarda um documento JSON por usuário com `user_id`, `revision` e `updated_at`. RLS usa `auth.uid()` para SELECT, INSERT e UPDATE. O papel anon não tem acesso. UPDATE confere a revisão carregada para evitar sobrescrever alterações de outra sessão. Não é ainda o esquema normalizado completo do briefing.
-
-## Login e primeiro acesso
-
-O app exige sessão Supabase confirmada e e-mail igual a `OWNER_EMAIL`. O planejamento inicia vazio: saldo, dívidas, movimentações, metas e dados profissionais devem ser preenchidos pelo usuário. `emptyState()` cria um documento independente com a data atual no fuso de São Paulo. O primeiro login não importa valores antigos da tabela de configuração. Nenhum dado pessoal fica no código ou nos testes.
-
-1. Configure a URL de produção em **Authentication → URL Configuration → Site URL**.
-2. Autorize `https://SEU-DOMINIO/auth/confirm` e `http://localhost:3000/auth/confirm` nas Redirect URLs.
-3. No site, abra **Primeiro acesso: criar minha conta**, usando o e-mail proprietário e uma senha de pelo menos 12 caracteres.
-4. Confirme o e-mail. Caso o template padrão não retorne ao app, configure a URL e o template conforme a documentação Supabase antes de repetir.
-5. Entre e, após alterações financeiras, clique em **Salvar e sincronizar**. A gravação ainda é manual.
-
-Não registre senhas ou tokens no GitHub. A configuração `OWNER_EMAIL` é apenas server-side. Para recuperação de senha, use inicialmente o painel Supabase; a tela de recuperação ainda não foi implementada.
-
-## GitHub
-
-Crie um repositório chamado `planejamento-financeiro`, sem README automático se for usar Git local. Na raiz deste projeto:
-
-```powershell
-git init
-git add .
-git commit -m "Aplicativo financeiro com Next.js e Supabase"
-git branch -M main
-git remote add origin https://github.com/FernandoReys/planejamento-financeiro.git
-git push -u origin main
-```
-
-Use a autenticação normal do GitHub; nunca coloque um token no endereço do remote. O `.gitignore` exclui `.env.local`, dependências e builds.
-
-## Vercel
-
-Importe o repositório pela integração GitHub na equipe `fernando-8621`. Framework: **Next.js**, pasta raiz: a pasta com `package.json`, instalação: `npm ci`, build: `npm run build`. Defina:
-
-| Variável | Conteúdo |
+| Variável | Valor |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave pública publishable |
-| `OWNER_EMAIL` | E-mail proprietário |
-| `NEXT_PUBLIC_SITE_URL` | URL definitiva da aplicação, sem barra final |
+| NEXT_PUBLIC_SUPABASE_URL | URL do projeto Supabase |
+| NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY | Chave pública publishable |
+| OWNER_EMAIL | E-mail proprietário autorizado |
+| NEXT_PUBLIC_SITE_URL | URL de produção |
 
-Publicar o frontend não publica os dados financeiros: a página exige login e as políticas do banco isolam cada usuário. O código pode ser público; os dados pessoais iniciais ficam exclusivamente no banco. Os testes utilizam valores sintéticos.
+Não use service_role no frontend. O código não contém senhas ou dados financeiros pessoais.
 
-## Recursos implementados
+## Banco e publicação
 
-- Dashboard e gráficos a partir dos valores cadastrados.
-- Edição de receitas/despesas mensais, antecipação opcional e pagamentos sem duplicar o mesmo mês.
-- Saldo em centavos inteiros; previsão diária, cenários e alerta de informações incompletas.
-- Feriados nacionais, Sexta-feira Santa e feriados locais manuais.
-- Obrigações separadas do veículo; contagem das parcelas explicitamente pendente.
-- Simulações de poupança, pagamento ao irmão e compra.
-- Reserva, CSV, impressão/PDF e backup JSON.
-- Login Supabase com cookies, renovação de sessão e persistência manual com controle de versão.
-- Manifesto PWA e cache de recursos estáticos. Não há fila offline de lançamentos.
-- Assistente determinístico local, sem modelo de IA externo.
+A tabela financial_state guarda um documento JSON por usuário. RLS limita leitura e escrita ao proprietário autenticado. O campo revision evita sobrescrever alterações de outra aba. As migrations em supabase/migrations documentam o esquema já aplicado; esta versão não exige nova migration.
 
-## Limitações conhecidas
+Supabase Authentication deve usar o domínio publicado em Site URL e permitir /auth/confirm nas Redirect URLs. O primeiro acesso exige confirmação do e-mail. A rota principal exige sessão válida e o e-mail proprietário.
 
-O app ainda não implementa o conjunto completo do briefing: INSS/IRRF e médias do 13º, notificações push, uploads de comprovantes, Excel nativo, parcelamento genérico, gráficos anuais completos e IA externa. A base provisória do 13º não entra no caixa. Despesas sem data não entram no calendário diário. A contagem das parcelas precisa ser confirmada antes de fechar o cronograma do veículo. Alterações de valores não reescrevem um histórico contábil. Metas são informativas e não fazem transferências automáticas.
+GitHub: https://github.com/FernandoReys/planejamento-financeiro
 
-O mês e o calendário acompanham a data de referência configurada. A previsão do financiamento precisa ser delimitada após a confirmação da contagem. O acordo particular segue as datas cadastradas; simulações não alteram esse cronograma. Não utilizar como único registro financeiro antes de validar o fluxo real de login, gravação, recarga e recuperação em outro dispositivo.
+Produção: https://planejamento-financeiro-eight-olive.vercel.app
+
+A Vercel publica a branch main automaticamente.
 
 ## Validação
 
-```powershell
+```sh
 npm test
 npm run typecheck
 npm run build
 ```
 
-Nove verificações financeiras, TypeScript e build Next.js passaram. Banco: existência da tabela, RLS, políticas de propriedade, privilégios e advisors de segurança verificados. O teste end-to-end de login/gravação continua pendente da conta proprietária e publicação.
-
-## Preenchimento e login
-
-Em Configurações, informe o saldo, salário, benefícios, veículo e acordo particular. As seções de salário, veículo e dívida também permitem edição direta. Receitas e despesas são cadastradas em Movimentações; novas metas são criadas em Metas. Use Salvar para persistir as alterações.
-
-O botão de olho mostra ou oculta a senha digitada. Manter conectado preserva a sessão do Supabase e lembra somente o e-mail localmente; a senha nunca é salva pelo código do aplicativo. Desmarcar a opção usa cookies de sessão e remove a lembrança do e-mail. O navegador pode oferecer seu próprio gerenciador de senhas. Sessões válidas vão direto ao painel.
+Testes cobrem cálculos em centavos, parcelas, pagamentos parciais, quitação, vencimentos mensais, pagamento duplicado, divisão por zero e expressões inválidas. A calculadora não executa código digitado. Os testes antigos do domínio financeiro são mantidos para compatibilidade dos dados anteriores.

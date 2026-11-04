@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {toCents,installmentsFor,debtSummary,recordPayment,calculateCents,validDate,type Debt} from '../lib/debts.ts';
+assert.equal(toCents('R$ 1.234,56'),123456);assert.equal(toCents('1234.56'),123456);assert.equal(toCents('1.000'),100000);assert.equal(toCents('-1'),null);
+const parts=installmentsFor(10000,3);assert.deepEqual(parts,[3334,3333,3333]);assert.equal(parts.reduce((a,b)=>a+b,0),10000);
+const d:Debt={id:'d',name:'Teste',total:30000,initialPaid:0,installments:3,firstDueDate:'2027-01-31',payments:[],createdAt:''};
+const p={id:'p',amount:5000,date:'2027-01-15'};const partial=recordPayment(d,p);assert.equal(debtSummary(partial).nextAmount,5000);assert.equal(debtSummary(partial).nextDue,'2027-01-31');assert.equal(recordPayment(partial,p),partial);
+const first=recordPayment(partial,{...p,id:'p2'});assert.equal(debtSummary(first).nextDue,'2027-02-28');const second=recordPayment(first,{...p,id:'p3',amount:10000});assert.equal(debtSummary(second).nextDue,'2027-03-31');const done=recordPayment(second,{...p,id:'p4',amount:10000});assert.equal(debtSummary(done).remaining,0);assert.equal(debtSummary(done).nextDue,null);
+assert.throws(()=>recordPayment(d,{...p,amount:30001}));assert.equal(validDate('2027-02-30'),false);
+assert.equal(calculateCents('0,1 + 0,2'),30);assert.equal(calculateCents('2 + 3 * 4'),1400);assert.equal(calculateCents('(2 + 3) × 4'),2000);assert.equal(calculateCents('500 - 500 * 10%'),45000);assert.equal(calculateCents('-0.005'),-1);assert.throws(()=>calculateCents('10/0'));assert.throws(()=>calculateCents('alert(1)'));
+console.log('Debt calculations and payment tests passed');
