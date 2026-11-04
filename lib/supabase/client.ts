@@ -1,2 +1,2 @@
-import {createBrowserClient} from '@supabase/ssr';
-export function createClient(){return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!);}
+import {createBrowserClient,parseCookieHeader,serializeCookieHeader} from '@supabase/ssr';
+export function createClient(){return createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,{cookies:{getAll(){return parseCookieHeader(document.cookie);},setAll(items){const temporary=parseCookieHeader(document.cookie).find(c=>c.name==='finance-remember')?.value==='0';items.forEach(({name,value,options})=>{const {maxAge,expires,...sessionOptions}=options;document.cookie=serializeCookieHeader(name,value,temporary&&value!==''&&maxAge!==0?sessionOptions:options);});}}});}

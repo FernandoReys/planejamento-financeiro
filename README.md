@@ -7,7 +7,7 @@ Aplicativo pessoal em **Next.js App Router, TypeScript, Tailwind CSS, Recharts e
 - Supabase: projeto `planejamento-financeiro`, região São Paulo (`sa-east-1`), organização CoinReys.
 - Banco criado e migrations executadas; RLS por usuário e privilégios mínimos verificados. Nenhuma movimentação pessoal é pública.
 - GitHub: código publicado em https://github.com/FernandoReys/planejamento-financeiro.
-- Vercel: criação do projeto recusada pela conexão atual (403, sem permissão para criar projetos). Não há deploy Vercel concluído.
+- Vercel: https://planejamento-financeiro-eight-olive.vercel.app (produção).
 - A versão anterior hospedada no Sites é independente deste checkout Next.js.
 
 ## Executar no Windows / VS Code
@@ -39,7 +39,7 @@ A tabela `financial_state` guarda um documento JSON por usuário com `user_id`, 
 
 ## Login e primeiro acesso
 
-O app exige sessão Supabase confirmada e e-mail igual a `OWNER_EMAIL`. Os dados financeiros iniciais ficam na tabela protegida `financial_bootstrap`, visível apenas ao e-mail proprietário conforme o token assinado pelo Supabase. Nenhum dado financeiro pessoal fica no código-fonte ou nos testes. No primeiro login confirmado, o servidor copia a configuração privada para `financial_state`.
+O app exige sessão Supabase confirmada e e-mail igual a `OWNER_EMAIL`. O planejamento inicia vazio: saldo, dívidas, movimentações, metas e dados profissionais devem ser preenchidos pelo usuário. `emptyState()` cria um documento independente com a data atual no fuso de São Paulo. O primeiro login não importa valores antigos da tabela de configuração. Nenhum dado pessoal fica no código ou nos testes.
 
 1. Configure a URL de produção em **Authentication → URL Configuration → Site URL**.
 2. Autorize `https://SEU-DOMINIO/auth/confirm` e `http://localhost:3000/auth/confirm` nas Redirect URLs.
@@ -94,7 +94,7 @@ Publicar o frontend não publica os dados financeiros: a página exige login e a
 
 O app ainda não implementa o conjunto completo do briefing: INSS/IRRF e médias do 13º, notificações push, uploads de comprovantes, Excel nativo, parcelamento genérico, gráficos anuais completos e IA externa. A base provisória do 13º não entra no caixa. Despesas sem data não entram no calendário diário. A contagem das parcelas precisa ser confirmada antes de fechar o cronograma do veículo. Alterações de valores não reescrevem um histórico contábil. Metas são informativas e não fazem transferências automáticas.
 
-A data e o mês de referência da interface inicial continuam novembro/2026. A previsão do financiamento precisa ser delimitada após a confirmação da contagem. O acordo particular segue as datas cadastradas; simulações não alteram esse cronograma. Não utilizar como único registro financeiro antes de validar o fluxo real de login, gravação, recarga e recuperação em outro dispositivo.
+O mês e o calendário acompanham a data de referência configurada. A previsão do financiamento precisa ser delimitada após a confirmação da contagem. O acordo particular segue as datas cadastradas; simulações não alteram esse cronograma. Não utilizar como único registro financeiro antes de validar o fluxo real de login, gravação, recarga e recuperação em outro dispositivo.
 
 ## Validação
 
@@ -105,3 +105,9 @@ npm run build
 ```
 
 Nove verificações financeiras, TypeScript e build Next.js passaram. Banco: existência da tabela, RLS, políticas de propriedade, privilégios e advisors de segurança verificados. O teste end-to-end de login/gravação continua pendente da conta proprietária e publicação.
+
+## Preenchimento e login
+
+Em Configurações, informe o saldo, salário, benefícios, veículo e acordo particular. As seções de salário, veículo e dívida também permitem edição direta. Receitas e despesas são cadastradas em Movimentações; novas metas são criadas em Metas. Use Salvar para persistir as alterações.
+
+O botão de olho mostra ou oculta a senha digitada. Manter conectado preserva a sessão do Supabase e lembra somente o e-mail localmente; a senha nunca é salva pelo código do aplicativo. Desmarcar a opção usa cookies de sessão e remove a lembrança do e-mail. O navegador pode oferecer seu próprio gerenciador de senhas. Sessões válidas vão direto ao painel.
